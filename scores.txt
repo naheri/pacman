@@ -1,29 +1,6 @@
-score: 10
-score: 0
-score: 5
-score: 20
-score: 5
-score: 5
-score: 15
-score: 20
-score: 0
-score: 15
-score: 30
-score: 30
-score: 30
-score: 15
-score: 10
-score: 20
-score: 10
-score: 0
-score: 5
-score: 0
-score: 15
-score: 0
-score: 0
-score: 0
-score: 10
-score: 20
-score: 15
-score: 10
-score: 5
+naheri score: 10
+rachid score: 5
+namir score: 5
+namirkababie score: 0
+namirkababie score: 0
+hjghg score: 0

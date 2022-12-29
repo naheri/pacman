@@ -19,6 +19,7 @@ from timeit import default_timer
 import time
 from tracemalloc import start
 TK_SILENCE_DEPRECATION=1
+from name import *
 
 # ----------------------------------------------------------------
 # Variables globales
@@ -461,7 +462,7 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                             if agents_contamines.count(agents[pNoAgent]) == 0:
                                 sontContamines[pNoAgent] = True # l'agent devient contaminé si il n'est pas vacciné
                                 agents_contamines.append(agents[pNoAgent])
-                            gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_COLLISION)
+                            gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_MALADIE)
                         else:
                             print("l'agent",pNoAgent,"est vacciné et ne peut pas être contaminé")
                     else:
@@ -476,15 +477,51 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                         collisionPiece = True
                         print("collision avec une pièce")
 
+    # si l'agent n'est pas vacciné ET contaminé, son état de santé diminue de 0.2 régulièrement
+    if sontContamines[pNoAgent] == True and etat_vaccination[pNoAgent] == False:
+        gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_MALADIE)
+        print("l'état de fonctionnement de l'agent",pNoAgent,"diminue de 0.2")
+        etat_fonc[pNoAgent] = etat_fonc[pNoAgent] - 0.2
+    if collisionAgentContamine == True:
+        gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_MALADIE)
+     #Inclure les couleurs choisies pour revenir à la couleur initiale apres collision selon le numero de l'agent autonome [2 3 4 5] vu que les deux premiers sont non autonomes============================================  
+    elif (pAutonomie and pNoAgent):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[0])
 
-    
+    elif (pAutonomie and pNoAgent == 3):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[1])
+
+    elif (pAutonomie and pNoAgent == 4):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[2])
+
+    elif (pAutonomie and pNoAgent == 5):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[3])
+
+    else :
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_NON_AUTO) #COULEUR_NON_AUTO)
     # Si l'agent est en collision avec un la zone de vaccination il ne peut plus être contaminé
     if collision_zone_de_vaccination == True:
-        sontContamines[pNoAgent] = False
         etat_vaccination[pNoAgent] = True
-        print("L'agent ",pNoAgent,"est immunisé")
         gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_GUERISON)
-        print(etat_vaccination)
+        if sontContamines[pNoAgent] == True:
+            sontContamines[pNoAgent] = False
+            agents_contamines.remove(agents[pNoAgent])
+        print("L'agent ",pNoAgent,"est immunisé, il arrête de perdre de l'état de fonctionnement")
+     #Inclure les couleurs choisies pour revenir à la couleur initiale apres collision selon le numero de l'agent autonome [2 3 4 5] vu que les deux premiers sont non autonomes============================================  
+    elif (pAutonomie and pNoAgent):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[0])
+
+    elif (pAutonomie and pNoAgent == 3):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[1])
+
+    elif (pAutonomie and pNoAgent == 4):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[2])
+
+    elif (pAutonomie and pNoAgent == 5):
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[3])
+
+    else :
+        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_NON_AUTO) #COULEUR_NON_AUTO)
 
     if collisionAutonome == True: # Changement de la couleur de l'agent si il est en collision
         if pNoAgent == 0 or pNoAgent == 1 :
@@ -630,7 +667,50 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
 
     return score_tot, currentTime
 
+def getScores():
+    # Open the text file
+    scores = []
+    with open('scores.txt', 'r') as f:
+        # Read the contents of the file
+        contents = f.read()
+        print(contents)
+        # Split the string into a list of lines
+        lines = contents.split('\n')
+        print(lines)
+        # Initialize a variable to store the highest score
+        highest_score = 0
+        # Iterate over the list of lines
+        for line in lines:
+            # Split the line into a list of words
+            words = line.split()
+            scores.append(score = words[2])
+    return scores
 
+'''
+    Fonction qui permet de sauvegarder le score dans un fichier texte'''
+
+def writeScore():
+    with open("scores.txt", "a") as f:
+        f.write("\n"+str(name_input)+ " score: "+str(score_tot))
+
+"""Obj: get high score from file"""
+def getHighScore():
+    # Open the text file
+    with open('scores.txt', 'r') as f:
+        # Read the contents of the file
+        contents = f.read()
+        print(contents)
+        # Split the string into a list of lines
+        lines = contents.split('\n')
+        print(lines)
+        # Initialize a variable to store the highest score
+        highest_score = 0
+        # Iterate over the list of lines
+        for line in lines:
+            # Split the line into a list of words
+            words = line.split()
+            highest_score = max(highest_score, int(words[2]))
+    return highest_score
 """
 Obj: Réinitialisation toutes les positions et les vitesses et arrêt des animations et déplacements
 """
@@ -679,9 +759,11 @@ def arret():
     print(agents_contamines)
     print(sontContamines)
     print(etat_vaccination)
-    with open("scores.txt", "a") as f:
-        f.write("score: "+str(score_tot)+"\n")
-
+    writeScore()
+    from graph import displayGraph
+    displayGraph()
+    # affichage de l'évolution du score
+    
 
 
 
@@ -729,7 +811,7 @@ temps.place(x=782,y=20)
 
 record = Canvas(fen_princ, width=LARG_ETIQUETTE, height=HAUT_ETIQUETTE, bg='ivory', bd=0, highlightthickness=0, background="blue")
 txtrecord =  record.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("RECORD \n") ,font = "Arial 20 italic",fill="yellow", anchor="center")
-vrairecord = record.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("\n0") ,font = "Arial 20 italic",fill="yellow", anchor="center")
+vrairecord = record.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("\n %d" %getHighScore()) ,font = "Arial 20 italic",fill="yellow", anchor="center")
 
 record.place(x=782,y=123)
 
@@ -760,8 +842,12 @@ for i in range(nbAgentAutonomes):
 
 for i in range(nb_pieces):
     creationPieces()
-#while isLaunched:
-    #contamination(agents[5])
+
+# get score
+with open('scores.txt', 'r') as f:
+    score = f.read()
+    score = score.split(':')
+    print(score[1])
 
 # affiche les agents
 agents_contamines.append(agents[n_agent_contamine-1]) # ajout d'un agent autonomen choisi aléatoirement dans la liste des agents contamines
