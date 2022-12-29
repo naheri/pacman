@@ -13,7 +13,8 @@ applications/.env
 # ignorer le sujet & compte rendu
 .CompteRENDUSUJET4Algorithmique.pdf
 .sujet_PACMAN.pdf
-
+CompteRENDUSUJET4Algorithmique.pdf
+sujet_PACMAN.pdf
 # ignorer les fichiers de configuration de l'IDE
 .idea
 .vscode

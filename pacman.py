@@ -403,7 +403,7 @@ Obj: Gestion des déplacements de tous agents
 
 """
 def deplacement(pNoAgent, pAutonomie, etat_fonc):
-    global agents, vitX, vitY, murs,k,score_tot, coincounter, currentTime, lastRecord
+    global agents, vitX, vitY, murs,k,score_tot, coincounter, currentTime, lastRecord, agents_contamines
     global etat_actif_depl_anim
     
     #Initialisation
@@ -453,6 +453,15 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                         print("collision de l'agent",pNoAgent,"avec un mur")
                     else:
                         m=m+1
+                v = 0
+                while ( v<len(agents) and collisionAgentContamine==False):
+                    if obs == agents_contamines[v]:
+                        collisionAgentContamine=True #Collision avec un agent contaminé détectée
+                        print("collision de l'agent",pNoAgent,"avec un agent contaminé")
+                        agents_contamines.append(agents[pNoAgent]) # ajout de l'agent contaminé dans la liste des agents contaminés
+                        sontContamines[pNoAgent] = True # l'agent devient contaminé
+                    else:
+                        v=v+1
                     #vérifier si obs est un agent autonome 
                 if (not collisionMur and not collision_zone_de_vaccination and not collisionPiece):
                     collisionAutonome = True
@@ -468,15 +477,10 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                 if collisionAutonome == True and sontContamines[pNoAgent] == True:
                     gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_COLLISION)
 
+    # l'agent devient violet si il y a collision avec un agent contaminé
+    if collisionAgentContamine == True and sontContamines[pNoAgent] == True:
+        gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_COLLISION)
 
-    '''          
-    if collisionAutonome == True:
-         gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_CONTAMINATION) 
-         if pNoAgent == 5:
-             while collision_zone_de_vaccination == False:
-                etat_fonc[pNoAgent] -= 1       
-                print("L'état de l'agent ",pNoAgent,"est à ",etat_fonc[pNoAgent])
-    '''
     if collisionAutonome == True: #Changement de la couleur de l'agent si il est en collision
         if pNoAgent == 0 or pNoAgent == 1 :
             gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_COLLISION) # <--- ça marche pas je sais pas pourquoi
@@ -495,26 +499,7 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
         etat_vaccination[pNoAgent] = True
         print("L'agent ",pNoAgent,"est immunisé")
         gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_GUERISON)
-        print(etat_vaccination)
 
-
-    #Inclure les couleurs choisis  pour revenir à la couleur initiale apres collision selon le numero de l'agent autonome [2 3 4 5] vu que les deux premiers sont non autonomes============================================  
-    elif (pAutonomie and pNoAgent == 2 and COULEUR_AUTO[0] == COULEUR_CONTAMINATION):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[0])
-
-    elif (pAutonomie and pNoAgent == 3 and COULEUR_AUTO[1] == COULEUR_CONTAMINATION):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[1])
-
-    elif (pAutonomie and pNoAgent == 4 and COULEUR_AUTO[2] == COULEUR_CONTAMINATION):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[2])
-
-    elif (pAutonomie and pNoAgent == 5 and COULEUR_AUTO[3] == COULEUR_CONTAMINATION):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[3])
-        #====================================================================================================================================================================================================================
-
-
-    else :
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_NON_AUTO) #COULEUR_NON_AUTO)
     pieces = 0
     if not sontAutonomes[pNoAgent] : 
         while ( pieces<len(tabpieces) and collisionPiece==False):
@@ -771,6 +756,8 @@ for i in range(nb_pieces):
 agents_contamines.append(agents[n_agent_contamine-1]) # ajout d'un agent autonomen choisi aléatoirement dans la liste des agents contamines
 print(agents)
 print(agents_contamines)
+print(etat_vaccination)
+
 
 #Zone dédiée aux boutons
 zoneBtn = Frame(fen_princ)
@@ -823,6 +810,7 @@ btnArret.pack(fill=X)
 btnInit = Button(zoneBtn, text="INIT", fg="yellow", bg="red", command=depart)
 btnInit.pack(fill=X)
 print(sontAutonomes)
+print(sontContamines)
 '''# Coordonnées de la position de la souris
 def callback(e):
    x= e.x
