@@ -20,6 +20,7 @@ import time
 from tracemalloc import start
 TK_SILENCE_DEPRECATION=1
 from name import *
+from graph2 import displayGraph
 
 # ----------------------------------------------------------------
 # Variables globales
@@ -412,10 +413,10 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
     etat_actif_depl_anim = True
     mod_angle = 0
     # Record précédent 
-    record.itemconfigure(vrairecord, text="%d" %lastRecord)
+    record.itemconfigure(vrairecord, text="\n %d" %getHighScore())
     # temps actuel
     currentTime =int(default_timer() - starttime)
-    temps.itemconfigure(vraitemps, text="%d" %currentTime)
+    temps.itemconfigure(vraitemps, text="\n%d" %currentTime)
     #Récupération des coordonnées de l'agent
     coordActuelles = gestionCanvas.coords(agents[pNoAgent])
 
@@ -717,8 +718,6 @@ Obj: Réinitialisation toutes les positions et les vitesses et arrêt des animat
 def depart():
 
     global vitX, vitY, starttime, lastRecord
-    fichier = open("scores.txt", "r")
-    lastRecord = json.loads(fichier.read)
     record.itemconfigure(vrairecord, text="%d" %lastRecord)
     #Mise à jour des boutons
     init_couleurs()
@@ -760,12 +759,20 @@ def arret():
     print(sontContamines)
     print(etat_vaccination)
     writeScore()
-    from graph import displayGraph
-    displayGraph()
     # affichage de l'évolution du score
     
-
-
+'''restart everything'''
+def restart():
+    global score_tot,temps
+    score_tot = 0
+    depart()
+    # on remet les variables à 0
+    for i in range (len(etat_vaccination)):
+        etat_vaccination[i] = False
+    for i in range (len(agents_contamines)):
+        agents_contamines[i] = False
+    for i in range (len(sontContamines)):
+        sontContamines[i] = False
 
 # ----------------------------------------------------------------
 # Corps du programme
@@ -803,7 +810,7 @@ nbpieces.place(x=782,y=443)
 
 temps = Canvas(fen_princ, width=LARG_ETIQUETTE, height=HAUT_ETIQUETTE, bg='ivory', bd=0, highlightthickness=0, background="blue")
 txttemps =  temps.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("TEMPS \n") ,font = "Arial 20 italic",fill="yellow", anchor="center")
-vraitemps = temps.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("\n\n0s") ,font = "Arial 20 italic",fill="yellow", anchor="center")
+vraitemps = temps.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("\n 0s") ,font = "Arial 20 italic",fill="yellow", anchor="center")
 
 temps.place(x=782,y=20)
 # paramétrage du canvas ("record")
@@ -866,44 +873,42 @@ zoneBtn1.grid(row=0,column=2,ipadx=5)
 #==========================================================================================================================================
 
 #Boutons directionnels 
-btnDroite = Button(zoneBtn, text=">>>", fg="yellow", bg="black",relief=SUNKEN, command=lambda: demarrage(VIT_MAX_Autonome,0,btnDroite))
+btnDroite = Button(zoneBtn, text=">>>", fg="black", bg="black",relief=SUNKEN, command=lambda: demarrage(VIT_MAX_Autonome,0,btnDroite))
 btnDroite.pack(fill=X)
 
-btnGauche = Button(zoneBtn, text="<<<", fg="yellow", bg="black", relief=SUNKEN,command=lambda:demarrage(-VIT_MAX_Autonome,0,btnGauche))
+btnGauche = Button(zoneBtn, text="<<<", fg="black", bg="black", relief=SUNKEN,command=lambda:demarrage(-VIT_MAX_Autonome,0,btnGauche))
 btnGauche.pack(fill=X)
 
-btnHaut = Button(zoneBtn, text="^^^", fg="yellow", bg="black",relief=SUNKEN, command=lambda:demarrage(0,-VIT_MAX_Autonome,btnHaut))
+btnHaut = Button(zoneBtn, text="^^^", fg="black", bg="black",relief=SUNKEN, command=lambda:demarrage(0,-VIT_MAX_Autonome,btnHaut))
 btnHaut.pack(fill=X)
 
-btnBas = Button(zoneBtn, text="vvv", fg="yellow", bg="black",relief=SUNKEN, command=lambda:demarrage(0,VIT_MAX_Autonome,btnBas))
+btnBas = Button(zoneBtn, text="vvv", fg="black", bg="black",relief=SUNKEN, command=lambda:demarrage(0,VIT_MAX_Autonome,btnBas))
 btnBas.pack(fill=X)
 
 
 
 
 #Boutons directionnels secondaires=======================================================================================================
-D = Button(zoneBtn1, text="D", fg="yellow", bg="black",relief=RAISED, command=lambda:demarrage2EME(VIT_MAX_Autonome,0,D))
+D = Button(zoneBtn1, text="D", fg="black", bg="black",relief=RAISED, command=lambda:demarrage2EME(VIT_MAX_Autonome,0,D))
 D.pack(fill=X)
 
-Q = Button(zoneBtn1, text="Q", fg="yellow", bg="black",relief=RAISED, command=lambda:demarrage2EME(-VIT_MAX_Autonome,0,Q))
+Q = Button(zoneBtn1, text="Q", fg="black", bg="black",relief=RAISED, command=lambda:demarrage2EME(-VIT_MAX_Autonome,0,Q))
 Q.pack(fill=X)
 
-Z = Button(zoneBtn1, text="Z", fg="yellow", bg="black",relief=RAISED, command=lambda:demarrage2EME(0,-VIT_MAX_Autonome,Z))
+Z = Button(zoneBtn1, text="Z", fg="black", bg="black",relief=RAISED, command=lambda:demarrage2EME(0,-VIT_MAX_Autonome,Z))
 Z.pack(fill=X)
 
-S = Button(zoneBtn1, text="S", fg="yellow", bg="black",relief=RAISED, command=lambda:demarrage2EME(0,VIT_MAX_Autonome,S))
+S = Button(zoneBtn1, text="S", fg="black", bg="black",relief=RAISED, command=lambda:demarrage2EME(0,VIT_MAX_Autonome,S))
 S.pack(fill=X)
 
 #=========================================================================================================================================
 
-
-
-
-
 #Boutons d'arrêt et de réinitialisation
-btnArret = Button(zoneBtn, text="STOP", fg="yellow", bg="red", command=arret)
+btnArret = Button(zoneBtn, text="STOP", fg="black", bg="red", command=arret)
 btnArret.pack(fill=X)
-btnInit = Button(zoneBtn, text="INIT", fg="yellow", bg="red", command=depart)
+showGraph = Button(zoneBtn, text="show Graph", fg="black", bg="red", command=displayGraph)
+showGraph.pack(fill=X)
+btnInit = Button(zoneBtn, text="INIT", fg="black", bg="red", command=depart)
 btnInit.pack(fill=X)
 print(sontAutonomes)
 '''# Coordonnées de la position de la souris
