@@ -251,13 +251,13 @@ def evenements(event):
     
 
     #boutons de contrôle WASD ==================================================================================================================      
-    if event.keysym=="Z":
+    if event.keysym=="Z" or event.keysym=="z":
         demarrage2EME(0,-VIT_MAX_Joueur,Z)
-    elif event.keysym=="S":
+    elif event.keysym=="S" or event.keysym=="s":
         demarrage2EME(0,VIT_MAX_Joueur,S)
-    elif event.keysym=="Q":
+    elif event.keysym=="Q" or event.keysym=="q":
         demarrage2EME(-VIT_MAX_Joueur,0,Q)
-    elif event.keysym=="D":
+    elif event.keysym=="D" or event.keysym=="d":
         demarrage2EME(VIT_MAX_Joueur,0,D)
     #=====================================================================================================================================
 
