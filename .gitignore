@@ -15,6 +15,7 @@ applications/.env
 .sujet_PACMAN.pdf
 CompteRENDUSUJET4Algorithmique.pdf
 sujet_PACMAN.pdf
+
 # ignorer les fichiers de configuration de l'IDE
 .idea
 .vscode
@@ -23,3 +24,9 @@ sujet_PACMAN.pdf
 .icon
 Icon\r\r
 Icon\r
+
+# pycache
+
+__pycache__/
+*.py[cod]
+*.pyc
