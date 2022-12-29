@@ -1,0 +1,13 @@
+score: 10
+score: 0
+score: 5
+score: 20
+score: 5
+score: 5
+score: 15
+score: 20
+score: 0
+score: 15
+score: 30
+score: 30
+score: 30

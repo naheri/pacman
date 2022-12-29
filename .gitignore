@@ -1,0 +1,23 @@
+# ignorer les fichiers .env
+.env
+
+# celui du site :
+applications/.env
+
+# ignorer les fichiers DS_Store
+**/.DS_Store
+*.DS_Store
+._.DS_Store
+**/._.DS_Store
+
+# ignorer le sujet & compte rendu
+.CompteRENDUSUJET4Algorithmique.pdf
+.sujet_PACMAN.pdf
+
+# ignorer les fichiers de configuration de l'IDE
+.idea
+.vscode
+
+#ignorer le fichier icon
+.icon
+Icon\r\r
