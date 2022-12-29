@@ -21,3 +21,4 @@ applications/.env
 #ignorer le fichier icon
 .icon
 Icon\r\r
+Icon\r
