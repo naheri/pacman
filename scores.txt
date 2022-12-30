@@ -255,3 +255,10 @@ n score: 5
 n score: 5
 n score: 40
 naheri score: 0
+n score: 25
+n score: 35
+n score: 15
+n score: 15
+h score: 50
+n score: 20
+a score: 25
