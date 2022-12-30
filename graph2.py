@@ -29,13 +29,10 @@ for line in lines:
         scores[player_name].append(score)
     else:
         scores[player_name] = [score]
-print("scores: ",scores)
 # Sort the players by the highest score
 sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-print("the sorted scores :", sorted_scores)
 # Get the names of the 2 best players
 best_players = [player_name for player_name, _ in sorted_scores[:2]]
-print("the best_players are ", best_players)
 game_number = min(len(scores[best_players[0]]), len(scores[best_players[1]]))
 x = [i for i in range(game_number)]
 default_x_ticks = range(len(x))

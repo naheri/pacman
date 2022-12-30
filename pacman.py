@@ -25,7 +25,8 @@ from graph2 import displayGraph
 # ----------------------------------------------------------------
 # Variables globales
 # ----------------------------------------------------------------
-
+nbAgentNonAutonomes=2
+nbAgentAutonomes = random.randint(3,10)
 #Liste des agents (ID)
 agents=[]
 #Liste des agents contaminés (ID) 
@@ -33,8 +34,8 @@ agents_vaccinés=[]
 #Liste des états d'autonomie des agents (booleen)
 sontAutonomes=[]
 # liste des états de contamination (booleen)
-sontContamines = [False,False,False,False,False,False]
-contaminable = [True,True,True,True,True,True]
+sontContamines = [False for i in range(nbAgentAutonomes+nbAgentNonAutonomes)]
+contaminable = [False for i in range(nbAgentAutonomes+nbAgentNonAutonomes)]
  # liste des agents contaminés (ID)
 agents_contamines = []
 
@@ -56,7 +57,7 @@ coordYInit1=[]#Ordonnée Agent2
 
 #informations pièces
 couleur_piece="green"
-nb_pieces=10
+nb_pieces = random.randint(10,20)
 tabpieces=[]
 RAYON_PIECE=4
 coincounter=0 # nombre de pièces ramasées
@@ -76,8 +77,8 @@ k=0
 
 
 # liste qui gère l'état de fonctionnement==============================================================================
-etat_fonc=[100,100,100,100,100,100]   #initialisés a 100%
-etat_fonc_contamines = [100,100,100,100,100,100] #états de fonctionnement initialisés à 100%
+etat_fonc= list(100 for i in range(nbAgentAutonomes+nbAgentNonAutonomes))  #initialisés a 100%
+print("etat_fonc",etat_fonc)
 #=====================================================================================================================
 
 
@@ -107,31 +108,25 @@ COULEUR_ZONE = "yellow"
 #Couleur des agents contaminés
 COULEUR_CONTAMINATION = "red"
 #couleur de guérison
-COULEUR_GUERISON =("blue") #Couleurs Agents    
-
+COULEUR_GUERISON =("blue") #Couleurs Agents en guérison   
+color_list = ["blue","green","orange","purple","pink","brown","grey","black"]
 #creation de différence couleur pour agents autonomes================================================================
 COULEUR_AUTO=[]
-
-
-
+random_color = random.choice(color_list)
+print("couleur aléatoire",random_color)
 # génère un nombre entier aléatoire 
 n_agent_contamine = random.randint(3,6)
-print(n_agent_contamine)
 print("l'agent n°",n_agent_contamine,"est contaminé")
-sontContamines = [False,False,False,False,False,False]
 sontContamines[n_agent_contamine-1] = True
 
 
-
-
-
 # appel de la fonction random pour générer des couleurs aléatoires
-for etat in range(2,6):
+for etat in range(2,nbAgentNonAutonomes+nbAgentAutonomes):
     if sontContamines[etat]==False:
-        COULEUR_AUTO.append("#%06x" % random.randint(0, 0xFFFFFF))
+        COULEUR_AUTO.append(random_color)
     else:
         COULEUR_AUTO.append(COULEUR_CONTAMINATION)
-print(COULEUR_AUTO)
+print("couleurs des agents autonomes",COULEUR_AUTO)
 #====================================================================================================================
 #Etat des animations et déplacements
 etat_actif_depl_anim = False
@@ -143,8 +138,7 @@ isLaunched = True
 # tableau d'état de contamination
 
 # tableau d'état de vaccination
-print(sontContamines)
-etat_vaccination = [False,False,False,False,False,False]
+etat_vaccination = [False for i in range(nbAgentAutonomes+nbAgentNonAutonomes)]
 niveau1 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -310,7 +304,7 @@ def creationAgent(pEstAutonome):
     vitX.append(0)
     vitY.append(0)
     if (pEstAutonome):
-        
+        print('Couleur auto i',COULEUR_AUTO[i])
         agents.append(gestionCanvas.create_arc(coordXInit[i],coordYInit[i],
                                         coordXInit[i]+coordLInit_Agent,coordYInit[i]+coordHInit_Agent,
                                         fill=COULEUR_AUTO[i],start=15,extent=330))    
@@ -531,18 +525,9 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
             print("L'état de l'agent ",pNoAgent,"est à ", etat_fonc[pNoAgent])
 
     #Inclure les couleurs choisies pour revenir à la couleur initiale apres collision selon le numero de l'agent autonome [2 3 4 5] vu que les deux premiers sont non autonomes============================================  
-    elif (pAutonomie and pNoAgent):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[0])
-
-    elif (pAutonomie and pNoAgent == 3):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[1])
-
-    elif (pAutonomie and pNoAgent == 4):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[2])
-
-    elif (pAutonomie and pNoAgent == 5):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[3])
-
+    for i in range(2,nbAgentAutonomes+nbAgentNonAutonomes):
+        if (pAutonomie and pNoAgent == i):
+            gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[i-2])
     else :
         gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_NON_AUTO) #COULEUR_NON_AUTO)
     pieces = 0
@@ -564,19 +549,9 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                 pieces+=1  
 
      #Inclure les couleurs choisies  pour revenir à la couleur initiale apres collision selon le numero de l'agent autonome [2 3 4 5] vu que les deux premiers sont non autonomes============================================  
-    elif (pAutonomie and pNoAgent == 2):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[0])
-
-    elif (pAutonomie and pNoAgent == 3):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[1])
-
-    elif (pAutonomie and pNoAgent == 4):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[2])
-
-    elif (pAutonomie and pNoAgent == 5):
-        gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[3])
-        #====================================================================================================================================================================================================================
-
+    for i in range(2,nbAgentAutonomes+nbAgentAutonomes):
+        if (pAutonomie and pNoAgent == i):
+            gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_AUTO[i-2])
 
     else :
         gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_NON_AUTO) #COULEUR_NON_AUTO)
@@ -589,15 +564,19 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
         vitY[pNoAgent]=0
 
     else :  
-
+        # le jeu s'arrête quand 60 secondes sont écoulées
+        if currentTime == 60:
+            arret()
+            gestionCanvas.create_text(HAUT_CANVAS/2, LARG_CANVAS/2, text="LE JEU EST TERMINÉ!!!", font=('Helvetica 50 bold'), fill="red")
+            print ('Game Over: le temps est écoulé')
 
         # Verifier si l'etat de fonctionnement des agents est egale a 0====================================================
-        if etat_fonc[pNoAgent] <= 0 :
+        if etat_fonc[pNoAgent]<= 0 and pNoAgent==0  :
         
             vitX[pNoAgent]=0  #immobiliser l'agent
             vitY[pNoAgent]=0
             #arret()
-            if etat_fonc[pNoAgent] <= 0 :   # si le deuxième agent est immobilisé, arret du jeu
+            if etat_fonc[pNoAgent] <= 0 and pNoAgent==1 :   # si le deuxième agent est immobilisé, arret du jeu
                 arret()
                 gestionCanvas.create_text(HAUT_CANVAS/2, LARG_CANVAS/2, text="LE JEU EST TERMINÉ!!!", font=('Helvetica 50 bold'), fill="red")
                 print ('Game Over: tous les agents sont immobilisés')
@@ -663,8 +642,9 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
     Arrêt de la partie lorsqu'il n'y a plus de pièces, écriture du score
     """
 
-    if score_tot == 50: # lorsque le score est au maximum, le jeu est fini, j'enregistre le score dans un fichier texte
+    if score_tot == 100: # lorsque le score est au maximum, le jeu est fini, j'enregistre le score dans un fichier texte
         arret()
+        gestionCanvas.create_text(HAUT_CANVAS/2, LARG_CANVAS/2, text="VOUS AVEZ GAGNÉ!!!", font=('Helvetica 50 bold'), fill="red")
 
     return score_tot, currentTime
 
@@ -674,10 +654,8 @@ def getScores():
     with open('scores.txt', 'r') as f:
         # Read the contents of the file
         contents = f.read()
-        print(contents)
         # Split the string into a list of lines
         lines = contents.split('\n')
-        print(lines)
         # Initialize a variable to store the highest score
         highest_score = 0
         # Iterate over the list of lines
@@ -700,10 +678,8 @@ def getHighScore():
     with open('scores.txt', 'r') as f:
         # Read the contents of the file
         contents = f.read()
-        print(contents)
         # Split the string into a list of lines
         lines = contents.split('\n')
-        print(lines)
         # Initialize a variable to store the highest score
         highest_score = 0
         # Iterate over the list of lines
@@ -754,12 +730,10 @@ def arret():
     #Mise à jour de la variable globale utilisée dans les déplacements
     dde_arret = True
     # ouverture du fichier texte à la fin de la partie
-    print(agents)
-    print(agents_contamines)
-    print(sontContamines)
-    print(etat_vaccination)
     writeScore()
-    # affichage de l'évolution du score
+    print("agents",agents)
+    print("agents_contamines",agents_contamines)
+    print("etat_vaccination",etat_vaccination)
     
 '''restart everything'''
 def restart():
@@ -838,12 +812,10 @@ for i in range(len(niveau1)):
         
 
 #Affichage des agents gérés par l'utilisateur
-nbAgentNonAutonomes=2
 for i in range(nbAgentNonAutonomes):
     creationAgent(False)
 
 #Affichage des agents autonomes
-nbAgentAutonomes=4
 for i in range(nbAgentAutonomes):
     creationAgent(True)
 
@@ -858,10 +830,9 @@ with open('scores.txt', 'r') as f:
 
 # affiche les agents
 agents_contamines.append(agents[n_agent_contamine-1]) # ajout d'un agent autonomen choisi aléatoirement dans la liste des agents contamines
-print(agents)
-print(agents_contamines)
-print(etat_vaccination)
-
+print("agents",agents)
+print("agents_contamines",agents_contamines)
+print("etat_vaccination",etat_vaccination)
 #Zone dédiée aux boutons
 zoneBtn = Frame(fen_princ)
 zoneBtn.grid(row=0,column=1,ipadx=5)

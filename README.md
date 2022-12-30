@@ -7,5 +7,5 @@ In order to stop this contamination and prevents any other, the agent (autonomou
 
 This game can be played with 2 players, one with the arrows and one with the ZQSD keys.
 
-You win when you reach 50 points.
+You win when you reach 100 points.
 You lose if the two playable players both can't move (reach 0 HP)
