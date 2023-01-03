@@ -19,7 +19,7 @@ sujet_PACMAN.pdf
 # ignorer fichier texte
 scores.txt
 # ignorer fichier test
-test.txt
+test.py
 
 # ignorer les fichiers de configuration de l'IDE
 .idea
