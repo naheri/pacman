@@ -262,3 +262,4 @@ n score: 15
 h score: 50
 n score: 20
 a score: 25
+naheri score: 20
