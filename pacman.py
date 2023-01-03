@@ -8,10 +8,11 @@ Description :
 
 """
 
+
+
 #Modules importés
 
 
-from textwrap import fill
 from tkinter import *
 import random
 import json
@@ -20,7 +21,13 @@ import time
 from tracemalloc import start
 TK_SILENCE_DEPRECATION=1
 from name import *
-from graph2 import displayGraph
+import os
+from sys import platform as sys_pf
+if sys_pf == 'darwin':
+    import matplotlib
+    matplotlib.use("TkAgg")
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # ----------------------------------------------------------------
 # Variables globales
@@ -34,9 +41,8 @@ agents_vaccinés=[]
 #Liste des états d'autonomie des agents (booleen)
 sontAutonomes=[]
 # liste des états de contamination (booleen)
-sontContamines = [False for i in range(nbAgentAutonomes+nbAgentNonAutonomes)]
-contaminable = [False for i in range(nbAgentAutonomes+nbAgentNonAutonomes)]
- # liste des agents contaminés (ID)
+sontContamines = [False for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
+contaminable = [False for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
 agents_contamines = []
 
 
@@ -77,7 +83,7 @@ k=0
 
 
 # liste qui gère l'état de fonctionnement==============================================================================
-etat_fonc= list(100 for i in range(nbAgentAutonomes+nbAgentNonAutonomes))  #initialisés a 100%
+etat_fonc = [100 for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
 print("etat_fonc",etat_fonc)
 #=====================================================================================================================
 
@@ -140,7 +146,7 @@ isLaunched = True
 # tableau d'état de contamination
 
 # tableau d'état de vaccination
-etat_vaccination = [False for i in range(nbAgentAutonomes+nbAgentNonAutonomes)]
+etat_vaccination = [False for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
 niveau1 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -182,7 +188,7 @@ def getCoordAleatoiresSansMur():
         
         i=random.randint(0,len(niveau1)-1)
         j=random.randint(0,len(niveau1[0])-1)
-        if (niveau1[i][j]==1 or niveau1[i][j]==2):
+        if niveau1[i][j] in [1, 2]:
             dispo=True
 
     return [i*LARG_CASE+5,j*HAUT_CASE+5]
@@ -244,20 +250,17 @@ def evenements(event):
     elif event.keysym=="Right":
         demarrage(VIT_MAX_Joueur,0,btnDroite)
 
-    
+
 
     #boutons de contrôle WASD ==================================================================================================================      
-    if event.keysym=="Z" or event.keysym=="z":
+    if event.keysym in ["Z", "z"]:
         demarrage2EME(0,-VIT_MAX_Joueur,Z)
-    elif event.keysym=="S" or event.keysym=="s":
+    elif event.keysym in ["S", "s"]:
         demarrage2EME(0,VIT_MAX_Joueur,S)
-    elif event.keysym=="Q" or event.keysym=="q":
+    elif event.keysym in ["Q", "q"]:
         demarrage2EME(-VIT_MAX_Joueur,0,Q)
-    elif event.keysym=="D" or event.keysym=="d":
+    elif event.keysym in ["D", "d"]:
         demarrage2EME(VIT_MAX_Joueur,0,D)
-    #=====================================================================================================================================
-
-
     elif event.keysym=="Escape":
         arret()
     elif event.keysym=="space":
@@ -296,27 +299,30 @@ Param : true si l'on souhaite créer un agent autonome
 """
 def creationAgent(pEstAutonome):
     global vitX,vitY,coordXInit,coordYInit,agents,sontAutonomes,n_agent_contamine
-    
-    posInitAgent=getCoordAleatoiresSansMur()
-    coordXInit.append(posInitAgent[0])
-    coordYInit.append(posInitAgent[1])
-    posInitAgent1=getCoordAleatoiresSansMur()
-    coordXInit1.append(posInitAgent1[0])
-    coordYInit1.append(posInitAgent1[1])
+
+    _extracted_from_creationAgent_4(coordXInit, coordYInit)
+    _extracted_from_creationAgent_4(coordXInit1, coordYInit1)
     vitX.append(0)
     vitY.append(0)
     if (pEstAutonome):
-        
+
         agents.append(gestionCanvas.create_arc(coordXInit[i],coordYInit[i],
                                         coordXInit[i]+coordLInit_Agent,coordYInit[i]+coordHInit_Agent,
                                         fill=COULEUR_AUTO[i],start=15,extent=330))    
-                    
+
     else:
-        
+
         agents.append(gestionCanvas.create_arc(coordXInit1[i],coordYInit1[i],
                                         coordXInit1[i]+coordLInit_Agent,coordYInit1[i]+coordHInit_Agent,
                                         fill=COULEUR_NON_AUTO,start=15,extent=330))
     sontAutonomes.append(pEstAutonome)
+
+
+# TODO Rename this here and in `creationAgent`
+def _extracted_from_creationAgent_4(arg0, arg1):
+    posInitAgent=getCoordAleatoiresSansMur()
+    arg0.append(posInitAgent[0])
+    arg1.append(posInitAgent[1])
 
 """
 Fonction s'occupant de la création de pièces
@@ -385,11 +391,9 @@ Obj: Lancement de tous les déplacements
 def deplacements():
 
     global etat_actif_depl_anim, dde_arret
-    
-    i=0
-    for noAgent in range(len(agents)):
+
+    for i, noAgent in enumerate(range(len(agents))):
         deplacement(noAgent,sontAutonomes[i],etat_fonc)
-        i+=1
     if dde_arret == False :#Tant que le jeu ne doit pas être arrêté
         fen_princ.after(100, deplacements)#Patienter 100ms afin d'appeler à nouveau cette même fonction (récursivité)
     else:
@@ -517,6 +521,7 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                 print("le score total est maintenant de ", score_tot)
             else:
                 pieces+=1  
+    
 
      #Inclure les couleurs choisies  pour revenir à la couleur initiale apres collision selon le numero de l'agent autonome [2 3 4 5] vu que les deux premiers sont non autonomes============================================  
     elif (pAutonomie and pNoAgent == 2):
@@ -540,8 +545,10 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
     else :
         gestionCanvas.itemconfig(agents[pNoAgent], fill=COULEUR_NON_AUTO) #COULEUR_NON_AUTO)
 
-        
-
+    # creation de pièces
+    if (nb_pieces==0):
+        for i in range(random.randint(1,5)):
+            creationPieces()
     if collisionMur :#Stopper l'agent
         vitX[pNoAgent]=0
         vitY[pNoAgent]=0
@@ -630,7 +637,9 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
         gestionCanvas.create_text(HAUT_CANVAS/2, LARG_CANVAS/2, text="VOUS AVEZ GAGNÉ!!!", font=('Helvetica 50 bold'), fill="red")
 
     return score_tot, currentTime
-
+def createScores():
+    with open('scores.txt', 'w') as f:
+        f.write('')
 def getScores():
     # Open the text file
     scores = []
@@ -639,8 +648,6 @@ def getScores():
         contents = f.read()
         # Split the string into a list of lines
         lines = contents.split('\n')
-        # Initialize a variable to store the highest score
-        highest_score = 0
         # Iterate over the list of lines
         for line in lines:
             # Split the line into a list of words
@@ -653,16 +660,42 @@ def getScores():
 
 def writeScore():
     with open("scores.txt", "a") as f:
-        f.write("\n"+str(name_input)+ " score: "+str(score_tot))
+        if score_tot is not None:
+            f.write(f"{str(name_input)} score: {str(score_tot)}" + "\n")
 
 """Obj: get high score from file"""
 def getHighScore():
+    global highest_score
+    # Open the text file
+    with open('scores.txt', 'r') as f:
+        print(f'highscore = {f.read()}')
+        if f.read() == '':
+            return 0
+        # Read the contents of the file
+        contents = f.read()
+        # Split the string into a list of lines
+        lines = contents.split('\n')
+        lines.pop()
+        # Initialize a variable to store the highest score
+        highest_score = 0
+        # Iterate over the list of lines
+        for line in lines:
+            # Split the line into a list of words
+            words = line.split()
+            highest_score = max(highest_score, int(words[2]))
+        print(f'highscore = {highest_score}')
+    return highest_score
+
+# write a function to get the high score from the file
+def getHighScore():
+    global highest_score
     # Open the text file
     with open('scores.txt', 'r') as f:
         # Read the contents of the file
         contents = f.read()
         # Split the string into a list of lines
         lines = contents.split('\n')
+        lines.pop()
         # Initialize a variable to store the highest score
         highest_score = 0
         # Iterate over the list of lines
@@ -671,6 +704,7 @@ def getHighScore():
             words = line.split()
             highest_score = max(highest_score, int(words[2]))
     return highest_score
+
 """
 Obj: Réinitialisation toutes les positions et les vitesses et arrêt des animations et déplacements
 """
@@ -681,7 +715,6 @@ def depart():
     #Mise à jour des boutons
     init_couleurs()
     btnInit.config(bg="blue")
-
     #Annulation de la vitesse en cours
     for i in range (len(vitX)):
         vitX[i]=0
@@ -717,6 +750,7 @@ def arret():
     print("agents",agents)
     print("agents_contamines",agents_contamines)
     print("etat_vaccination",etat_vaccination)
+    print(f'highscore = {getHighScore()}')
     
 '''restart everything'''
 def restart():
@@ -734,7 +768,9 @@ def restart():
 # ----------------------------------------------------------------
 # Corps du programme
 # ----------------------------------------------------------------
-
+# if scores.txt is empty, create it
+if not os.path.exists('scores.txt'):
+    createScores()
 #Paramétrage de la fenêtre principale
 fen_princ = Tk()
 fen_princ.title("PACAGENT L1 SPI")
@@ -761,7 +797,7 @@ vrainbpieces = nbpieces.create_text(LARG_ETIQUETTE/2,HAUT_ETIQUETTE/2,text=("\n 
 
 nbpieces.place(x=782,y=443)
 
-    
+
 # paramétrage du canvas ("temps")
 
 
@@ -792,7 +828,7 @@ for i in range(len(niveau1)):
             #affichage zone de vaccination
         if (niveau1[i][j]==2):
             zone_de_vaccination.append(gestionCanvas.create_rectangle(i*LARG_CASE, j*HAUT_CASE,(i+1)*LARG_CASE, (j+1)*HAUT_CASE, fill="pink", outline=""))
-        
+
 
 #Affichage des agents gérés par l'utilisateur
 for i in range(nbAgentNonAutonomes):
@@ -804,12 +840,6 @@ for i in range(nbAgentAutonomes):
 
 for i in range(nb_pieces):
     creationPieces()
-
-# get score
-with open('scores.txt', 'r') as f:
-    score = f.read()
-    score = score.split(':')
-    print(score[1])
 
 # affiche les agents
 agents_contamines.append(agents[n_agent_contamine-1]) # ajout d'un agent autonomen choisi aléatoirement dans la liste des agents contamines
@@ -860,7 +890,8 @@ S.pack(fill=X)
 #Boutons d'arrêt et de réinitialisation
 btnArret = Button(zoneBtn, text="STOP", fg="black", bg="red", command=arret)
 btnArret.pack(fill=X)
-showGraph = Button(zoneBtn, text="show Graph", fg="black", bg="red", command=displayGraph)
+from graph2 import displayGraph
+showGraph = Button(zoneBtn, text="show 2 best players Graph", fg="black", bg="red", command=displayGraph)
 showGraph.pack(fill=X)
 btnInit = Button(zoneBtn, text="INIT", fg="black", bg="red", command=depart)
 btnInit.pack(fill=X)
@@ -872,4 +903,4 @@ def callback(e):
    print("Coords pointeur : %dx, %dy" %(x,y))
 fen_princ.bind('<Motion>',callback)'''
 #Rafraichissement de la fenêtre et de tout son contenu
-fen_princ.mainloop() 
+fen_princ.mainloop()

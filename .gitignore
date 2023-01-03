@@ -10,11 +10,16 @@ applications/.env
 ._.DS_Store
 **/._.DS_Store
 
-# ignorer le sujet & compte rendu
+# ignorer le sujet & compte rendu 
 .CompteRENDUSUJET4Algorithmique.pdf
 .sujet_PACMAN.pdf
 CompteRENDUSUJET4Algorithmique.pdf
 sujet_PACMAN.pdf
+
+# ignorer fichier texte
+scores.txt
+# ignorer fichier test
+test.txt
 
 # ignorer les fichiers de configuration de l'IDE
 .idea
