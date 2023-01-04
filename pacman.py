@@ -15,12 +15,10 @@ Description :
 
 from tkinter import *
 import random
-import json
 from timeit import default_timer
-import time
-from tracemalloc import start
 TK_SILENCE_DEPRECATION=1
 from name import *
+from time_entry import *
 import os
 from sys import platform as sys_pf
 if sys_pf == 'darwin':
@@ -462,7 +460,6 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
                             if agents_contamines.count(agents[pNoAgent]) == 0:
                                 sontContamines[pNoAgent] = True # l'agent devient contaminé si il n'est pas vacciné
                                 agents_contamines.append(agents[pNoAgent])
-                            gestionCanvas.itemconfig(agents[pNoAgent], fill = COULEUR_MALADIE)
                         else:
                             print("l'agent",pNoAgent,"est vacciné et ne peut pas être contaminé")
                     else:
@@ -555,7 +552,7 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
 
     else :  
         # le jeu s'arrête quand 60 secondes sont écoulées
-        if currentTime == 60:
+        if currentTime == int(time_input):
             arret()
             gestionCanvas.create_text(HAUT_CANVAS/2, LARG_CANVAS/2, text="LE JEU EST TERMINÉ!!!", font=('Helvetica 50 bold'), fill="red")
             print ('Game Over: le temps est écoulé')
@@ -750,7 +747,6 @@ def arret():
     print("agents",agents)
     print("agents_contamines",agents_contamines)
     print("etat_vaccination",etat_vaccination)
-    print(f'highscore = {getHighScore()}')
     
 '''restart everything'''
 def restart():
@@ -773,7 +769,7 @@ if not os.path.exists('scores.txt'):
     createScores()
 #Paramétrage de la fenêtre principale
 fen_princ = Tk()
-fen_princ.title("PACAGENT L1 SPI")
+fen_princ.title("PACMAN")
 fen_princ.geometry("900x700")#Dimensions de la fenêtre
 fen_princ.bind("<Key>",evenements)#Définition de la fonction de gestion des évènements clavier
 
