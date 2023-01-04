@@ -17,8 +17,7 @@ from tkinter import *
 import random
 from timeit import default_timer
 TK_SILENCE_DEPRECATION=1
-from name import *
-from time_entry import *
+from config import *
 import os
 from sys import platform as sys_pf
 if sys_pf == 'darwin':
@@ -30,7 +29,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # ----------------------------------------------------------------
 # Variables globales
 # ----------------------------------------------------------------
-nbAgentNonAutonomes=2
 nbAgentAutonomes = random.randint(3,10)
 #Liste des agents (ID)
 agents=[]
@@ -39,8 +37,8 @@ agents_vaccinés=[]
 #Liste des états d'autonomie des agents (booleen)
 sontAutonomes=[]
 # liste des états de contamination (booleen)
-sontContamines = [False for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
-contaminable = [False for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
+sontContamines = [False for _ in range(nbAgentAutonomes+int(num_players))]
+contaminable = [False for _ in range(nbAgentAutonomes+int(num_players))]
 agents_contamines = []
 
 
@@ -81,7 +79,7 @@ k=0
 
 
 # liste qui gère l'état de fonctionnement==============================================================================
-etat_fonc = [100 for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
+etat_fonc = [100 for _ in range(nbAgentAutonomes+int(num_players))]
 print("etat_fonc",etat_fonc)
 #=====================================================================================================================
 
@@ -118,7 +116,7 @@ color_list = ["blue","green","orange","purple","pink","brown","grey","black"]
 COULEUR_AUTO=[]
 random_color = random.choice(color_list)
 # génère un nombre entier aléatoire 
-n_agent_contamine = random.randint(3,nbAgentAutonomes+nbAgentNonAutonomes)
+n_agent_contamine = random.randint(int(num_players)+1,nbAgentAutonomes+int(num_players))
 print("l'agent n°",n_agent_contamine,"est contaminé")
 sontContamines[n_agent_contamine-1] = True
 
@@ -127,7 +125,7 @@ print("choix aléatoire de la couleur de l'agent contaminé", )
 
 
 # appel de la fonction random pour générer des couleurs aléatoires
-for etat in range(2,nbAgentNonAutonomes+nbAgentAutonomes):
+for etat in range(int(num_players),int(num_players)+nbAgentAutonomes):
     if sontContamines[etat]==False:
         COULEUR_AUTO.append(random.choice(color_list))
     else:
@@ -144,7 +142,7 @@ isLaunched = True
 # tableau d'état de contamination
 
 # tableau d'état de vaccination
-etat_vaccination = [False for _ in range(nbAgentAutonomes+nbAgentNonAutonomes)]
+etat_vaccination = [False for _ in range(nbAgentAutonomes+int(num_players))]
 niveau1 = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -413,8 +411,8 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
     # Record précédent 
     record.itemconfigure(vrairecord, text="\n %d" %getHighScore())
     # temps actuel
-    currentTime =int(default_timer() - starttime)
-    temps.itemconfigure(vraitemps, text="\n%d" %currentTime)
+    currentTime =int(default_timer() - int(game_time))
+    temps.itemconfigure(vraitemps, text="\n%ds" %(starttime-currentTime))
     #Récupération des coordonnées de l'agent
     coordActuelles = gestionCanvas.coords(agents[pNoAgent])
 
@@ -552,7 +550,7 @@ def deplacement(pNoAgent, pAutonomie, etat_fonc):
 
     else :  
         # le jeu s'arrête quand 60 secondes sont écoulées
-        if currentTime == int(time_input):
+        if currentTime == 0:
             arret()
             gestionCanvas.create_text(HAUT_CANVAS/2, LARG_CANVAS/2, text="LE JEU EST TERMINÉ!!!", font=('Helvetica 50 bold'), fill="red")
             print ('Game Over: le temps est écoulé')
@@ -658,7 +656,7 @@ def getScores():
 def writeScore():
     with open("scores.txt", "a") as f:
         if score_tot is not None:
-            f.write(f"{str(name_input)} score: {str(score_tot)}" + "\n")
+            f.write(f"{str(player_name)} score: {str(score_tot)}" + "\n")
 
 """Obj: get high score from file"""
 def getHighScore():
@@ -827,7 +825,7 @@ for i in range(len(niveau1)):
 
 
 #Affichage des agents gérés par l'utilisateur
-for i in range(nbAgentNonAutonomes):
+for i in range(int(num_players)):
     creationAgent(False)
 
 #Affichage des agents autonomes
